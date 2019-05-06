@@ -139,7 +139,7 @@ def bytes2set(b):
 # FastSS class
 
 class FastSS:
-    def __init__(self, path, flag='c', max_dist=2):
+    def __init__(self, path, flag='c', max_dist=2, in_memory=False):
         """Open an FastSS index file on <path>.
 
         flag: the mode in which the index is opened. Use "r" for read-only,
@@ -158,6 +158,11 @@ class FastSS:
             self.max_dist = max_dist
             self.db[MAXDIST_KEY] = int2byte(max_dist)
 
+        if in_memory:
+            d = dict(self.db)
+            self.db.close()
+            self.db = d
+
     def __enter__(self):
         return self
 
@@ -171,9 +176,9 @@ class FastSS:
         return False
 
     @classmethod
-    def open(cls, path, flag='c', max_dist=2):
+    def open(cls, path, flag='c', max_dist=2, in_memory=False):
         """Conventional interface for opening FastSS index file"""
-        return cls(path, flag, max_dist)
+        return cls(path, flag, max_dist, in_memory=in_memory)
 
     def close(self):
         self.db.close()
